@@ -20,7 +20,6 @@ public class Maze {
 	private Wall[][][] allWalls;
 	private List<Wall> remainingWalls;
 	private Map<Integer, Room> allRoomsMap;
-	private Integer currentRoomId = 0;
 	
 	public Maze(int width, int height) {
 		this.mazeWidth = width;
@@ -34,10 +33,16 @@ public class Maze {
 		this.remainingWalls = new ArrayList<>();
 		this.allRoomsMap = new HashMap<>();
 		
+		// Initialize the maze to set up all data structures
 		initializeMaze();
+		
+		// Randomly remove walls until the maze is generated
+		createRandomMaze();
 	}
 	
 	private void initializeMaze() {
+		Integer currentRoomId = 0;
+		
 		for(int i = 0; i < mazeWidth; i++) {
 			for(int j = 0; j < mazeHeight; j++) {
 				// Create the grid square
@@ -168,7 +173,7 @@ public class Maze {
 		return result;
 	}
 	
-	public void createRandomMaze() {
+	private void createRandomMaze() {
 		Random rng = new Random();
 		
 		while(allRoomsMap.size() > 1) {

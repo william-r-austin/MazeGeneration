@@ -8,7 +8,6 @@ public class Main {
 		
 		// Create random maze
 		Maze randomMaze = new Maze(30, 15);
-		randomMaze.createRandomMaze();
 		
 		// End time
 		long end = System.currentTimeMillis();
