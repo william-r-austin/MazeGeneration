@@ -47,7 +47,6 @@ public class Maze {
 				// Assign it to a new Room
 				Room room = new Room(currentRoomId, gridSquare);
 				allRoomsMap.put(currentRoomId, room);
-				//allRooms.add(new Room(gridSquare));
 				
 				// Increment the room id
 				currentRoomId++;
