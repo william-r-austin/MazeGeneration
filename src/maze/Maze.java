@@ -9,12 +9,12 @@ import java.util.Random;
 import java.util.Set;
 
 public class Maze {
-	private  int MAZE_WIDTH = 40;
-	private  int MAZE_HEIGHT = 18;
+	private static final int DEFAULT_PRINT_WIDTH = 4;
+	private static final int DEFAULT_PRINT_HEIGHT = 2;
+	private static final char DEFAULT_WALL_CHAR = '#';
 	
-	private static final int GS_CHAR_WIDTH = 4;
-	private static final int GS_CHAR_HEIGHT = 2;
-	private static final char WALL_CHAR = '#';
+	private final int mazeWidth;
+	private final int mazeHeight;
 	
 	private GridSquare[][] allGridSquares;
 	private Wall[][][] allWalls;
@@ -23,13 +23,13 @@ public class Maze {
 	private Integer currentRoomId = 0;
 	
 	public Maze(int width, int height) {
-		this.MAZE_WIDTH = width;
-		this.MAZE_HEIGHT = height;
+		this.mazeWidth = width;
+		this.mazeHeight = height;
 		
-		this.allGridSquares = new GridSquare[MAZE_WIDTH][MAZE_HEIGHT];
+		this.allGridSquares = new GridSquare[mazeWidth][mazeHeight];
 
 		int numDirections = Direction.values().length;
-		this.allWalls = new Wall[MAZE_WIDTH + 1][MAZE_HEIGHT+1][numDirections];
+		this.allWalls = new Wall[mazeWidth + 1][mazeHeight+1][numDirections];
 
 		this.remainingWalls = new ArrayList<>();
 		this.allRoomsMap = new HashMap<>();
@@ -38,8 +38,8 @@ public class Maze {
 	}
 	
 	private void initializeMaze() {
-		for(int i = 0; i < MAZE_WIDTH; i++) {
-			for(int j = 0; j < MAZE_HEIGHT; j++) {
+		for(int i = 0; i < mazeWidth; i++) {
+			for(int j = 0; j < mazeHeight; j++) {
 				// Create the grid square
 				GridSquare gridSquare = new GridSquare(i, j, currentRoomId);
 				allGridSquares[i][j] = gridSquare;
@@ -53,11 +53,11 @@ public class Maze {
 			}
 		}
 		
-		for(int i = 0; i < MAZE_WIDTH + 1; i++) {
-			for(int j = 0; j < MAZE_HEIGHT + 1; j++) {
+		for(int i = 0; i < mazeWidth + 1; i++) {
+			for(int j = 0; j < mazeHeight + 1; j++) {
 				// Don't create vertical walls at the bottom
-				if(j < MAZE_HEIGHT) {
-					boolean permanent = (i == 0 || i == MAZE_WIDTH);
+				if(j < mazeHeight) {
+					boolean permanent = (i == 0 || i == mazeWidth);
 					
 					Wall wall = new Wall(i, j, Direction.Vertical, permanent);
 					int dirIndex = Direction.Vertical.getIntValue();
@@ -67,7 +67,7 @@ public class Maze {
 						remainingWalls.add(wall);
 					}
 					
-					if(i < MAZE_WIDTH) {
+					if(i < mazeWidth) {
 						GridSquare current = allGridSquares[i][j];
 						current.setWall(0, wall);
 						wall.setPrimary(current);
@@ -81,8 +81,8 @@ public class Maze {
 				}
 				
 				// Don't create horizontal walls on the right side
-				if(i < MAZE_WIDTH) {
-					boolean permanent = (j == 0 || j == MAZE_HEIGHT);
+				if(i < mazeWidth) {
+					boolean permanent = (j == 0 || j == mazeHeight);
 					
 					Wall wall = new Wall(i, j, Direction.Horizontal, permanent);
 					int dirIndex = Direction.Horizontal.getIntValue();
@@ -92,7 +92,7 @@ public class Maze {
 						remainingWalls.add(wall);
 					}
 					
-					if(j < MAZE_HEIGHT) {
+					if(j < mazeHeight) {
 						GridSquare current = allGridSquares[i][j];
 						current.setWall(1, wall);
 						wall.setPrimary(current);
@@ -109,16 +109,24 @@ public class Maze {
 	}
 	
 	public void printMaze() {
-		int xRange = MAZE_WIDTH * (GS_CHAR_WIDTH + 1) + 1;
-		int yRange = MAZE_HEIGHT * (GS_CHAR_HEIGHT + 1) + 1;
+		printMaze(DEFAULT_PRINT_WIDTH, DEFAULT_PRINT_HEIGHT, DEFAULT_WALL_CHAR);
+	}
+	
+	public void printMaze(int printWidth, int printHeight) {
+		printMaze(printWidth, printHeight, DEFAULT_WALL_CHAR);
+	}
+		
+	public void printMaze(int printWidth, int printHeight, char wallChar) {
+		int xRange = mazeWidth * (printWidth + 1) + 1;
+		int yRange = mazeHeight * (printHeight + 1) + 1;
 		
 		for(int y = 0; y < yRange; y++) {
 			for(int x = 0; x < xRange; x++) {
-				int vWallIndex = x / (GS_CHAR_WIDTH + 1);
-				boolean vWallFlag = (x % (GS_CHAR_WIDTH + 1) == 0);
+				int vWallIndex = x / (printWidth + 1);
+				boolean vWallFlag = (x % (printWidth + 1) == 0);
 				
-				int hWallIndex = y / (GS_CHAR_HEIGHT + 1);
-				boolean hWallFlag = (y % (GS_CHAR_HEIGHT + 1) == 0);
+				int hWallIndex = y / (printHeight + 1);
+				boolean hWallFlag = (y % (printHeight + 1) == 0);
 				
 				boolean wallPresentFlag = false;
 				if(vWallFlag && hWallFlag) {
@@ -131,7 +139,7 @@ public class Maze {
 					wallPresentFlag = wallIsPresent(vWallIndex, hWallIndex, 1);
 				}
 				
-				char outputChar = (wallPresentFlag ? WALL_CHAR : ' ');
+				char outputChar = (wallPresentFlag ? wallChar : ' ');
 				System.out.print(outputChar);
 			}
 			System.out.println();
@@ -139,7 +147,7 @@ public class Maze {
 	}
 	
 	private boolean wallIsPresent(int x, int y, int direction) {
-		if(x >= 0 && x < MAZE_WIDTH + 1 && y >= 0 && y < MAZE_HEIGHT + 1) {
+		if(x >= 0 && x < mazeWidth + 1 && y >= 0 && y < mazeHeight + 1) {
 			Wall testWall = allWalls[x][y][direction];
 			if(testWall != null) { 
 				if(testWall.isPermanent() || !testWall.isRemoved()) {
