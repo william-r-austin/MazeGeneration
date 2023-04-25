@@ -182,8 +182,8 @@ public class Maze {
 		Random rng = new Random();
 		
 		while(allRoomsMap.size() > 1) {
-			boolean isValidWall = false;
-			while(!isValidWall) {
+			boolean foundWallToRemove = false;
+			while(!foundWallToRemove) {
 				int wallIndex = rng.nextInt(remainingWalls.size());
 				Wall wallToRemove = remainingWalls.get(wallIndex);
 				
@@ -195,7 +195,7 @@ public class Maze {
 					Integer secondaryRoomId = secondary.getRoomId();
 					
 					if(!primaryRoomId.equals(secondaryRoomId)) {
-						isValidWall = true;
+						foundWallToRemove = true;
 						wallToRemove.setRemoved();
 						remainingWalls.remove(wallIndex);
 						mergeRooms(primaryRoomId, secondaryRoomId);

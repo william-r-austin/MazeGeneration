@@ -5,9 +5,23 @@ import java.util.Objects;
 public class Wall {
 	private int x;
 	private int y;
-	private Direction direction; // 0 = vertical, 1 = horizontal
+	private Direction direction;
 	private boolean permanent;
 	private boolean removed;
+	
+	// A wall can border 2 grid squares. The 'permanent' walls on the outside of the maze will
+	// only border one grid square.
+	// 
+	// For VERTICAL WALLS:
+	// - The primary grid square is the one to the RIGHT of the wall.
+	// - The secondary grid square is the one to the LEFT of the wall.
+	//
+	// FOR HORIZONTAL WALLS:
+	// - The primary grid square is the one BELOW the wall.
+	// - The secondary grid square is the one ABOVE the wall.
+	//
+	// Note that the x, y coordinates for the wall will always match the x, y coordinates for the
+	// primary grid square.
 	private GridSquare primary;
 	private GridSquare secondary;
 			

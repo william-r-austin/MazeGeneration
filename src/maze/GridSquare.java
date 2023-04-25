@@ -6,6 +6,15 @@ public class GridSquare {
 	private int x;
 	private int y;
 	private Integer roomId;
+
+	// Every GridSquare is surrounded by 4 walls. In the adjacent walls array:
+	// adjacentWalls[0] = Wall to the LEFT
+	// adjacentWalls[1] = Wall at the TOP
+	// adjacentWalls[2] = Wall to the RIGHT
+	// adjacentWalls[3] = Wall at the BOTTOM
+	//
+	// Note that the walls to the LEFT and TOP share (x, y) coordinates with this
+	// grid square.
 	private Wall[] adjacentWalls;
 	
 	public GridSquare(int x, int y, Integer roomId) {
