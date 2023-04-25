@@ -2,8 +2,7 @@
 Generates a random maze.
 
 # Sample Usage:
-<pre>
-<code>
+```java
 package maze;
 
 public class Main {
@@ -26,9 +25,7 @@ public class Main {
 		System.out.printf("Generated maze in %.3f seconds\n", seconds);
 	}
 }
-</code>
-</pre>
-
+```
 
 # Sample Output:
 <pre>
