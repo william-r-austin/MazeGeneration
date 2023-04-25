@@ -7,12 +7,13 @@ public class Main {
 		long start = System.currentTimeMillis();
 		
 		// Create random maze
-		Maze randomMaze = new Maze(30, 15);
+		Maze randomMaze = new Maze(25, 15);
 		
 		// End time
 		long end = System.currentTimeMillis();
 
-		// Print the maze
+		// Print the maze, specifying how many characters each room
+		// covers, as well as the character to use to represent a wall
 		randomMaze.printMaze(2, 1, '@');
 		
 		// Print total time.

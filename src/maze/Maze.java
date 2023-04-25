@@ -27,8 +27,8 @@ public class Maze {
 		
 		this.allGridSquares = new GridSquare[mazeWidth][mazeHeight];
 
-		int numDirections = Direction.values().length;
-		this.allWalls = new Wall[mazeWidth + 1][mazeHeight+1][numDirections];
+		int numOrientations = Orientation.size();
+		this.allWalls = new Wall[mazeWidth + 1][mazeHeight+1][numOrientations];
 
 		this.remainingWalls = new ArrayList<>();
 		this.allRoomsMap = new HashMap<>();
@@ -66,8 +66,8 @@ public class Maze {
 				if(j < mazeHeight) {
 					boolean permanent = (i == 0 || i == mazeWidth);
 					
-					Wall wall = new Wall(i, j, Direction.Vertical, permanent);
-					int dirIndex = Direction.Vertical.getIntValue();
+					Wall wall = new Wall(i, j, Orientation.Vertical, permanent);
+					int dirIndex = Orientation.Vertical.getIndex();
 					
 					allWalls[i][j][dirIndex] = wall;
 					if(!permanent) {
@@ -76,13 +76,13 @@ public class Maze {
 					
 					if(i < mazeWidth) {
 						GridSquare current = allGridSquares[i][j];
-						current.setWall(0, wall);
+						current.setWall(Direction.Left, wall);
 						wall.setPrimary(current);
 					}
 					
 					if(i > 0) {
 						GridSquare other = allGridSquares[i - 1][j];
-						other.setWall(2, wall);
+						other.setWall(Direction.Right, wall);
 						wall.setSecondary(other);
 					}
 				}
@@ -91,8 +91,8 @@ public class Maze {
 				if(i < mazeWidth) {
 					boolean permanent = (j == 0 || j == mazeHeight);
 					
-					Wall wall = new Wall(i, j, Direction.Horizontal, permanent);
-					int dirIndex = Direction.Horizontal.getIntValue();
+					Wall wall = new Wall(i, j, Orientation.Horizontal, permanent);
+					int dirIndex = Orientation.Horizontal.getIndex();
 					
 					allWalls[i][j][dirIndex] = wall;
 					if(!permanent) {
@@ -101,13 +101,13 @@ public class Maze {
 					
 					if(j < mazeHeight) {
 						GridSquare current = allGridSquares[i][j];
-						current.setWall(1, wall);
+						current.setWall(Direction.Up, wall);
 						wall.setPrimary(current);
 					}
 					
 					if(j > 0) {
 						GridSquare other = allGridSquares[i][j - 1];
-						other.setWall(3, wall);
+						other.setWall(Direction.Down, wall);
 						wall.setSecondary(other);
 					}
 				}
@@ -143,10 +143,10 @@ public class Maze {
 					wallPresentFlag = showCorner(x, y);
 				}
 				else if(vertWallFlag && !horzWallFlag) {
-					wallPresentFlag = wallIsPresent(x, y, 0);
+					wallPresentFlag = wallIsPresent(x, y, Orientation.Vertical);
 				}
 				else if(!vertWallFlag && horzWallFlag) {
-					wallPresentFlag = wallIsPresent(x, y, 1);
+					wallPresentFlag = wallIsPresent(x, y, Orientation.Horizontal);
 				}
 				
 				char outputChar = (wallPresentFlag ? wallChar : ' ');
@@ -156,9 +156,10 @@ public class Maze {
 		}
 	}
 	
-	private boolean wallIsPresent(int x, int y, int direction) {
+	private boolean wallIsPresent(int x, int y, Orientation orientation) {
 		if(x >= 0 && x < mazeWidth + 1 && y >= 0 && y < mazeHeight + 1) {
-			Wall testWall = allWalls[x][y][direction];
+			int orientationIndex = orientation.getIndex();
+			Wall testWall = allWalls[x][y][orientationIndex];
 			if(testWall != null) { 
 				if(testWall.isPermanent() || !testWall.isRemoved()) {
 					return true;
@@ -170,10 +171,10 @@ public class Maze {
 	
 	private boolean showCorner(int x, int y) {
 		boolean result = false;
-		result = (result || wallIsPresent(x, y, 0));
-		result = (result || wallIsPresent(x, y, 1));
-		result = (result || wallIsPresent(x, y - 1, 0));
-		result = (result || wallIsPresent(x - 1, y, 1));
+		result = (result || wallIsPresent(x, y, Orientation.Vertical));
+		result = (result || wallIsPresent(x, y, Orientation.Horizontal));
+		result = (result || wallIsPresent(x, y - 1, Orientation.Vertical));
+		result = (result || wallIsPresent(x - 1, y, Orientation.Horizontal));
 		
 		return result;
 	}
@@ -229,16 +230,17 @@ public class Maze {
 		Set<Wall> checkedWalls = new HashSet<>();
 		
 		for(GridSquare smallRoomSquare : smallerRoom.getGridSquares()) {
-			for(int z = 0; z < 4; z++) {
-				Wall checkWall = smallRoomSquare.getWall(z);
+			for(Direction direction : Direction.values()) {
+				Wall checkWall = smallRoomSquare.getWall(direction);
+			
 				if(!checkWall.isPermanent() && !checkWall.isRemoved() && !checkedWalls.contains(checkWall)) {
 					checkedWalls.add(checkWall);
 					
 					GridSquare checkSquare = null;
-					if(z <= 1) {
+					if(Direction.Left == direction || Direction.Up == direction) {
 						checkSquare = checkWall.getSecondary();
 					}
-					else {
+					else if(Direction.Right == direction || Direction.Down == direction) {
 						checkSquare = checkWall.getPrimary();
 					}
 					
@@ -278,14 +280,15 @@ public class Maze {
 		else {
 			cleanupCommonWalls(roomId1, roomId2);
 		}
-		
-		if(room1Size <= room2Size) {
-			room1.merge(room2);
-			allRoomsMap.remove(roomId2);
-		}
-		else {
+
+		// Merge the smaller room into the larger room
+		if(room1Size < room2Size) {
 			room2.merge(room1);
 			allRoomsMap.remove(roomId1);
+		}
+		else {
+			room1.merge(room2);
+			allRoomsMap.remove(roomId2);
 		}
 	}
 }

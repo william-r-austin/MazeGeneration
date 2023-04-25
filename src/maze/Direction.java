@@ -1,16 +1,16 @@
 package maze;
 
 public enum Direction {
-	Vertical(0),
-	Horizontal(1);
+	Left,
+	Up,
+	Right,
+	Down;
 		
-	private int intValue;
-	
-	private Direction(int intValue) {
-		this.intValue = intValue;
+	public static int size() {
+		return Direction.values().length;
 	}
 	
-	public int getIntValue() {
-		return intValue;
+	public int getIndex() {
+		return ordinal();
 	}
 }

@@ -5,7 +5,7 @@ import java.util.Objects;
 public class Wall {
 	private int x;
 	private int y;
-	private Direction direction;
+	private Orientation orientation;
 	private boolean permanent;
 	private boolean removed;
 	
@@ -25,10 +25,10 @@ public class Wall {
 	private GridSquare primary;
 	private GridSquare secondary;
 			
-	public Wall(int x, int y, Direction direction, boolean isPermanent) {
+	public Wall(int x, int y, Orientation orientation, boolean isPermanent) {
 		this.x = x;
 		this.y = y;
-		this.direction = direction;
+		this.orientation = orientation;
 		this.permanent = isPermanent;
 		this.removed = false;
 	}
@@ -41,8 +41,8 @@ public class Wall {
 		return y;
 	}
 
-	public Direction getDirection() {
-		return direction;
+	public Orientation getOrienation() {
+		return orientation;
 	}
 
 	public boolean isPermanent() {
@@ -75,7 +75,7 @@ public class Wall {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(direction, permanent, x, y);
+		return Objects.hash(orientation, permanent, x, y);
 	}
 
 	@Override
@@ -87,6 +87,6 @@ public class Wall {
 		if (getClass() != obj.getClass())
 			return false;
 		Wall other = (Wall) obj;
-		return direction == other.direction && permanent == other.permanent && x == other.x && y == other.y;
+		return orientation == other.orientation && permanent == other.permanent && x == other.x && y == other.y;
 	}
 }

@@ -1,5 +1,6 @@
 package maze;
 
+import java.util.EnumMap;
 import java.util.Objects;
 
 public class GridSquare {
@@ -7,21 +8,17 @@ public class GridSquare {
 	private int y;
 	private Integer roomId;
 
-	// Every GridSquare is surrounded by 4 walls. In the adjacent walls array:
-	// adjacentWalls[0] = Wall to the LEFT
-	// adjacentWalls[1] = Wall at the TOP
-	// adjacentWalls[2] = Wall to the RIGHT
-	// adjacentWalls[3] = Wall at the BOTTOM
+	// Every GridSquare is surrounded by 4 walls, in each of the 4 directions
 	//
-	// Note that the walls to the LEFT and TOP share (x, y) coordinates with this
-	// grid square.
-	private Wall[] adjacentWalls;
+	// Note that the walls in the 'Left' and 'Up' directions share (x, y) 
+	// coordinates with this grid square.
+	private EnumMap<Direction, Wall> adjacentWallsMap;
 	
 	public GridSquare(int x, int y, Integer roomId) {
 		this.x = x;
 		this.y = y;
 		this.roomId = roomId;
-		this.adjacentWalls = new Wall[4];
+		this.adjacentWallsMap = new EnumMap<>(Direction.class);
 	}
 
 	public int getX() {
@@ -40,18 +37,14 @@ public class GridSquare {
 		this.roomId = roomId;
 	}
 	
-	public void setWall(int wallId, Wall wall) {
-		adjacentWalls[wallId] = wall;
+	public void setWall(Direction direction, Wall wall) {
+		adjacentWallsMap.put(direction, wall);
 	}
 	
-	public Wall getWall(int wallId) {
-		return adjacentWalls[wallId];
+	public Wall getWall(Direction direction) {
+		return adjacentWallsMap.get(direction);
 	}
 	
-	public Wall[] getAdjacentWalls() {
-		return adjacentWalls;
-	}
-
 	@Override
 	public int hashCode() {
 		return Objects.hash(x, y);
