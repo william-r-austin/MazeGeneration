@@ -43,6 +43,7 @@ public class Maze {
 	private void initializeMaze() {
 		Integer currentRoomId = 0;
 		
+		// Create all grid squares.
 		for(int i = 0; i < mazeWidth; i++) {
 			for(int j = 0; j < mazeHeight; j++) {
 				// Create the grid square
@@ -58,6 +59,7 @@ public class Maze {
 			}
 		}
 		
+		// Create all walls
 		for(int i = 0; i < mazeWidth + 1; i++) {
 			for(int j = 0; j < mazeHeight + 1; j++) {
 				// Don't create vertical walls at the bottom
@@ -122,26 +124,29 @@ public class Maze {
 	}
 		
 	public void printMaze(int printWidth, int printHeight, char wallChar) {
-		int xRange = mazeWidth * (printWidth + 1) + 1;
-		int yRange = mazeHeight * (printHeight + 1) + 1;
+		int horzRange = mazeWidth * (printWidth + 1) + 1;
+		int vertRange = mazeHeight * (printHeight + 1) + 1;
 		
-		for(int y = 0; y < yRange; y++) {
-			for(int x = 0; x < xRange; x++) {
-				int vWallIndex = x / (printWidth + 1);
-				boolean vWallFlag = (x % (printWidth + 1) == 0);
+		for(int vertIndex = 0; vertIndex < vertRange; vertIndex++) {
+			for(int horzIndex = 0; horzIndex < horzRange; horzIndex++) {
+				// Translate the current point to grid square coordinates
+				int x = horzIndex / (printWidth + 1);
+				int y = vertIndex / (printHeight + 1);
 				
-				int hWallIndex = y / (printHeight + 1);
-				boolean hWallFlag = (y % (printHeight + 1) == 0);
+				// Determine if we at a point that corresponds to a wall
+				// of the current grid square
+				boolean horzWallFlag = (vertIndex % (printHeight + 1) == 0);
+				boolean vertWallFlag = (horzIndex % (printWidth + 1) == 0);
 				
 				boolean wallPresentFlag = false;
-				if(vWallFlag && hWallFlag) {
-					wallPresentFlag = showCorner(vWallIndex, hWallIndex);
+				if(vertWallFlag && horzWallFlag) {
+					wallPresentFlag = showCorner(x, y);
 				}
-				else if(vWallFlag && !hWallFlag) {
-					wallPresentFlag = wallIsPresent(vWallIndex, hWallIndex, 0);
+				else if(vertWallFlag && !horzWallFlag) {
+					wallPresentFlag = wallIsPresent(x, y, 0);
 				}
-				else if(!vWallFlag && hWallFlag) {
-					wallPresentFlag = wallIsPresent(vWallIndex, hWallIndex, 1);
+				else if(!vertWallFlag && horzWallFlag) {
+					wallPresentFlag = wallIsPresent(x, y, 1);
 				}
 				
 				char outputChar = (wallPresentFlag ? wallChar : ' ');
@@ -253,6 +258,17 @@ public class Maze {
 		int room1Size = room1.size();
 		int room2Size = room2.size();
 		
+		// Note that both versions of cleanupCommonWalls() will work, but
+		// at different points in the maze generation, one version might be
+		// faster.
+		// 
+		// For example, at the beginning, the rooms we are merging are small,
+		// so it is fast to simply check all of the walls that are associated
+		// with the rooms being merged.
+		// 
+		// At the end of maze generation, the rooms are large, but there are
+		// fewer eligible walls to remove, so it will be faster to simply
+		// iterate through that list to do the check.
 		if(room1Size <= room2Size && (room1Size * 4 < remainingWallCount)) {
 			cleanupCommonWalls(room1, roomId2);
 		}
